@@ -54,6 +54,14 @@
 # See libs/proxy/src/main/java/com/facebook/fbui/textlayoutbuilder/proxy for details.
 -dontwarn android.text.StaticLayout
 
+-keep class android.text {* ;}
+-dontwarn android.text.*
+
+-keep class com.facebook.react.bridge.CatalystInstanceImpl { *; }
+-keep class com.facebook.react.bridge.JavaScriptExecutor { *; }
+-keep class com.facebook.react.bridge.queue.NativeRunnable { *; }
+-keep class com.facebook.react.bridge.ReadableType { *; }
+
 # okhttp
 
 -keepattributes Signature

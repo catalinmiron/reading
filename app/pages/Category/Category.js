@@ -25,7 +25,7 @@ import {
   DeviceEventEmitter,
   ScrollView,
   RefreshControl,
-  Alert
+  Alert,
 } from 'react-native';
 
 import AV from 'leancloud-storage';
@@ -34,6 +34,7 @@ import GridView from '../../components/GridView';
 import Button from '../../components/Button';
 import ToastUtil from '../../utils/ToastUtil';
 import NavigationUtil from '../../utils/NavigationUtil';
+import fontUri from '../../utils/FontUtil';
 
 let tempTypeIds = [];
 let maxCategory = 5; // 默认最多5个类别，远端可配置
@@ -44,6 +45,18 @@ const propTypes = {
 };
 
 class Category extends React.Component {
+  static navigationItem = {
+    titleItem: {
+      title: '分类'
+    },
+
+    tabItem: {
+      title: '分类',
+      icon: { uri: fontUri('Ionicons', 'md-pricetags', 24) },
+      hideTabBarWhenPush: true,
+    },
+  };
+
   constructor(props) {
     super(props);
     this.state = {
@@ -52,8 +65,11 @@ class Category extends React.Component {
   }
 
   componentWillMount() {
-    const { params } = this.props.navigation.state;
-    if (params === undefined || !params.isFirst) {
+    if (!this.props.isFirst) {
+      this.props.garden.setRightBarButtonItem({
+        icon: { uri: fontUri('Ionicons', 'md-checkmark', 24) },
+        action: this.onActionSelected,
+      });
       InteractionManager.runAfterInteractions(() => {
         store.get('typeIds').then((typeIds) => {
           tempTypeIds = typeIds;
@@ -72,10 +88,6 @@ class Category extends React.Component {
     query.get('57b86e0ba633bd002a96436b').then((settings) => {
       maxCategory = settings.get('max_category');
     });
-    const { params } = this.props.navigation.state;
-    if (params === undefined || !params.isFirst) {
-      this.props.navigation.setParams({ handleCheck: this.onActionSelected });
-    }
   }
 
   onRefresh = () => {
@@ -103,7 +115,7 @@ class Category extends React.Component {
           text: '确定',
           onPress: () => {
             store.save('typeIds', this.state.typeIds);
-            NavigationUtil.reset(this.props.navigation, 'Home');
+            NavigationUtil.resetRootToHome();
           }
         }
       ]);
@@ -112,7 +124,7 @@ class Category extends React.Component {
     } else {
       store.save('typeIds', this.state.typeIds);
       store.save('isInit', true);
-      NavigationUtil.reset(this.props.navigation, 'Home');
+      NavigationUtil.resetRootToHome();
     }
   };
 
@@ -124,7 +136,6 @@ class Category extends React.Component {
     if (tempTypeIds.length < 1) {
       ToastUtil.showShort('不要少于1个类别哦');
     }
-    const { navigate } = this.props.navigation;
     InteractionManager.runAfterInteractions(() => {
       store.get('typeIds').then((typeIds) => {
         if (
@@ -133,7 +144,7 @@ class Category extends React.Component {
             .sort()
             .toString()
         ) {
-          navigate('Main');
+          this.props.navigator.switchToTab(0);
           return;
         }
         store.save('typeIds', this.state.typeIds).then(this.routeMain);
@@ -142,9 +153,8 @@ class Category extends React.Component {
   };
 
   routeMain = () => {
-    const { navigate } = this.props.navigation;
     DeviceEventEmitter.emit('changeCategory', this.state.typeIds);
-    navigate('Main');
+    this.props.navigator.switchToTab(0);
   };
 
   renderItem = (item) => {
@@ -198,8 +208,7 @@ class Category extends React.Component {
   };
 
   render() {
-    const { params } = this.props.navigation.state;
-    if (params !== undefined && params.isFirst) {
+    if (this.props.isFirst) {
       return (
         <View style={styles.container}>
           <View style={styles.header}>
@@ -242,7 +251,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
   },
   categoryBtn: {
     margin: 10,

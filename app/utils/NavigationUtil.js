@@ -15,16 +15,47 @@
  * limitations under the License.
  *
  */
-import { NavigationActions } from 'react-navigation';
+import { Navigator } from 'react-native-navigation-hybrid';
 
-const reset = (navigation, routeName) => {
-  const resetAction = NavigationActions.reset({
-    index: 0,
-    actions: [NavigationActions.navigate({ routeName })]
+function resetRootToCategory() {
+  Navigator.setRoot({
+    stack: {
+      screen: {
+        moduleName: 'Category',
+        props: { isFirst: true },
+      }
+    }
   });
-  navigation.dispatch(resetAction);
-};
+}
+
+function resetRootToHome() {
+  Navigator.setRoot({
+    tabs: [
+      {
+        stack: {
+          screen: { moduleName: 'Main' }
+        }
+      },
+      {
+        stack: {
+          screen: { moduleName: 'Category' }
+        }
+      },
+      {
+        stack: {
+          screen: { moduleName: 'Feedback' }
+        }
+      },
+      {
+        stack: {
+          screen: { moduleName: 'About' }
+        }
+      }
+    ]
+  });
+}
 
 export default {
-  reset
+  resetRootToCategory,
+  resetRootToHome,
 };

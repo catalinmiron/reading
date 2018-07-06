@@ -22,11 +22,10 @@ import {
   InteractionManager,
   ListView,
   StyleSheet,
-  View
+  View,
 } from 'react-native';
-import ScrollableTabView, {
-  ScrollableTabBar
-} from 'react-native-scrollable-tab-view';
+
+import ScrollableTabView, { ScrollableTabBar } from 'react-native-scrollable-tab-view';
 import store from 'react-native-simple-store';
 
 import LoadingView from '../../components/LoadingView';
@@ -118,8 +117,8 @@ class Main extends React.Component {
   };
 
   onPress = (article) => {
-    const { navigate } = this.props.navigation;
-    navigate('Web', { article });
+    const { navigation } = this.props;
+    navigation.push('Web', { article }, { titleItem: { title: article.userName } });
   };
 
   onIconClicked = () => {
@@ -140,6 +139,7 @@ class Main extends React.Component {
       loadMoreTime = Date.parse(new Date()) / 1000;
     }
   };
+
   renderFooter = () => {
     const { read } = this.props;
     return read.isLoadMore ? <Footer /> : <View />;
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
   },
   drawerContent: {
     flexDirection: 'row',
